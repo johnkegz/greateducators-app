@@ -9,48 +9,55 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Button,
-  WebView,
+  RefreshControl,
 } from 'react-native';
 import {getFeeds} from '../APi/index';
 
 export default class HomeScreen extends Component {
   state = {
     data: [],
+    refreshing: false,
   };
   displayFeed = stories => {
-    const result = stories.length === 0 ? <View style={{alignItems: 'center'}}><Text>loading......</Text></View> :stories.map(story => {
-      let pic = story.picUrl;
-      return (
-        <View key={story.id} style={styles.feed}>
-          <View style={styles.feedImageView}>
-            <Image
-              // source={require("../assets/images/bu.png")}
-              source={{uri: pic}}
-              style={styles.feedImage}
-            />
-          </View>
-          <View style={styles.feedStory}>
-            <View style={styles.title}>
-              <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate('Content', {story: story})
-                }>
-                <Text>{story.title}</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.feedStoryTime}>
-              <HTML
-                html={moment(story.createdAt)
-                  .startOf('minutes')
-                  .fromNow()}
-              />
-              <Text />
-            </View>
-          </View>
+    const result =
+      stories.length === 0 ? (
+        <View style={{alignItems: 'center'}}>
+          <Text>loading......</Text>
         </View>
+      ) : (
+        stories.map(story => {
+          let pic = story.picUrl;
+          return (
+            <View key={story.id} style={styles.feed}>
+              <View style={styles.feedImageView}>
+                <Image
+                  // source={require("../assets/images/bu.png")}
+                  source={{uri: pic}}
+                  style={styles.feedImage}
+                />
+              </View>
+              <View style={styles.feedStory}>
+                <View style={styles.title}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.props.navigation.navigate('Content', {story: story})
+                    }>
+                    <Text>{story.title}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.feedStoryTime}>
+                  <HTML
+                    html={moment(story.createdAt)
+                      .startOf('minutes')
+                      .fromNow()}
+                  />
+                  <Text />
+                </View>
+              </View>
+            </View>
+          );
+        })
       );
-    });
 
     return result;
   };
@@ -63,12 +70,28 @@ export default class HomeScreen extends Component {
     );
   }
   render() {
-    const {data} = this.state;
+    const {data, refreshing} = this.state;
     return (
       <View style={styles.container}>
         <ScrollView
           style={styles.container}
-          contentContainerStyle={styles.contentContainer}>
+          contentContainerStyle={styles.contentContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                setTimeout(() => {
+                  this.setState({refreshing: false});
+                }, 2000);
+                this.setState({refreshing: true});
+                getFeeds().then(res => {
+                  this.setState({
+                    data: res.data,
+                  });
+                });
+              }}
+            />
+          }>
           <View style={styles.welcomeContainer}>
             <TouchableOpacity
               onPress={() => {
