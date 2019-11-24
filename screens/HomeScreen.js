@@ -15,7 +15,7 @@ import {getFeeds} from '../APi/index';
 
 export default class HomeScreen extends Component {
   state = {
-    data: [],
+    data: this.props.navigation.getParam('stories'),
     refreshing: false,
   };
   displayFeed = stories => {
@@ -62,15 +62,18 @@ export default class HomeScreen extends Component {
     return result;
   };
 
-  componentDidMount() {
-    getFeeds().then(res =>
-      this.setState({
-        data: res.data,
-      }),
-    );
-  }
+  // componentDidMount() {
+  //   getFeeds().then(res =>
+  //     this.setState({
+  //       data: res.data,
+  //     }),
+  //   );
+  // }
   render() {
     const {data, refreshing} = this.state;
+
+    console.log("console.log", this.props.navigation.getParam('stories'));
+    console.log("data +++>>>>>>>>", data);
     return (
       <View style={styles.container}>
         <ScrollView

@@ -10,6 +10,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../screens/HomeScreen';
 import ContentScreen from '../screens/ContentScreen';
 import WebViewComponent from '../screens/WebViewComponent';
+import PostScreen from '../screens/PostScreen';
 // import RouteConfigs from './Routes';
 
 const config = Platform.select({
@@ -25,16 +26,31 @@ const HomeStack = createStackNavigator(
   },
   config,
 );
+const postFeedStack = createStackNavigator(
+  {
+    Post: PostScreen,
+    // Content: ContentScreen,
+    // WebViewComponent: WebViewComponent,
+  },
+  config,
+);
 
 HomeStack.navigationOptions = {
   tabBarLabel: 'Home',
   tabBarIcon: ({focused}) => <Icon name="ios-home" size={30} color="#4F8EF7" />,
 };
 
+//Post stack
+postFeedStack.navigationOptions = {
+  tabBarLabel: 'Post',
+  tabBarIcon: ({focused}) => <Icon name="ios-add-circle" size={30} color="#4F8EF7" />,
+};
+postFeedStack.path = '';
 HomeStack.path = '';
 
 const tabNavigator = createBottomTabNavigator({
   HomeStack,
+  postFeedStack,
 });
 
 tabNavigator.path = '';
