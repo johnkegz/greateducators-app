@@ -1,5 +1,5 @@
-import React, {Component} from 'react';;
-import {Text, View, StyleSheet, Image, ScrollView} from 'react-native';;
+import React, {Component} from 'react';
+import {Text, View, StyleSheet, Image, ScrollView} from 'react-native';
 import {getFeed} from '../APi/index';
 import HTML from 'react-native-render-html';
 import moment from 'moment';
@@ -11,8 +11,19 @@ export class ContentScreen extends Component {
 
   render() {
     const {
-      data: {title, feed, picUrl, createdAt},
+      data: {
+        title,
+        feed,
+        picUrl,
+        createdAt,
+        user: {lastName},
+      },
     } = this.state;
+    let time = moment(createdAt)
+      .startOf('minutes')
+      .fromNow();
+    let timeData = `<div style="font-size: 12; color: rgba(96,100,109, 1);
+          margin-top: 3;">${time}</div>`;
     return (
       <View style={styles.main}>
         <ScrollView>
@@ -28,17 +39,28 @@ export class ContentScreen extends Component {
               <Text style={{fontWeight: 'bold'}}>{title}</Text>
             </Text>
           </View>
-          <HTML
-            html={moment(createdAt)
-              .startOf('minutes')
-              .fromNow()}
-          />
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <View>
+              <HTML html={timeData} />
+            </View>
+            <View>
+              <Text>
+                <Text>         </Text>
+              </Text>
+            </View>
+            <View>
+              <Text style={styles.by}>posted by: </Text>
+            </View>
+            <View>
+              <Text style={styles.by}>{lastName}</Text>
+            </View>
+          </View>
           <View style={styles.feed}>
             {feed ? <HTML html={feed} /> : <Text />}
           </View>
         </ScrollView>
       </View>
-    );;
+    );
   }
 }
 
@@ -47,11 +69,13 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
-  // imageView:{
-  //     height: 200,
-  //     backgroundColor: 'red',
-  //     resizeMode: 'contain'
-  // },
+  by: {
+    fontSize: 12,
+    bottom: 0,
+    paddingBottom: 0,
+    marginTop: 3,
+    color: 'rgba(96,100,109, 1)',
+  },
   image: {
     width: 350,
     height: 200,
@@ -60,6 +84,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 5,
   },
-});;
+});
 
 export default ContentScreen;

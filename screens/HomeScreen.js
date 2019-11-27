@@ -11,12 +11,15 @@ import {
   View,
   RefreshControl,
 } from 'react-native';
-import {getFeeds} from '../APi/index';
+import {getFeeds, getAd} from '../APi/index';
+import ReadMore from './More';
 
 export default class HomeScreen extends Component {
   state = {
     data: this.props.navigation.getParam('stories'),
     refreshing: false,
+    adData: [],
+    readMore: false,
   };
   displayFeed = stories => {
     const result =
@@ -27,33 +30,52 @@ export default class HomeScreen extends Component {
       ) : (
         stories.map(story => {
           let pic = story.picUrl;
+          let time = moment(story.createdAt)
+            .startOf('minutes')
+            .fromNow();
+          let timeData = `<div style="font-size: 12; color: rgba(96,100,109, 1);
+          margin-top: 3;">${time}</div>`;
           return (
             <View key={story.id} style={styles.feed}>
               <View style={styles.feedImageView}>
-                <Image
-                  // source={require("../assets/images/bu.png")}
-                  source={{uri: pic}}
-                  style={styles.feedImage}
-                />
-              </View>
-              <View style={styles.feedStory}>
-                <View style={styles.title}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      this.props.navigation.navigate('Content', {story: story})
-                    }>
-                    <Text>{story.title}</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.feedStoryTime}>
-                  <HTML
-                    html={moment(story.createdAt)
-                      .startOf('minutes')
-                      .fromNow()}
+                <TouchableOpacity
+                  onPress={() =>
+                    this.props.navigation.navigate('Content', {story: story})
+                  }>
+                  <Image
+                    // source={require("../assets/images/bu.png")}
+                    source={{uri: pic}}
+                    style={styles.feedImage}
                   />
-                  <Text />
-                </View>
+                </TouchableOpacity>
               </View>
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('Content', {story: story})
+                }>
+                <View style={styles.feedStory}>
+                  <View style={styles.title}>
+                    <Text>{story.title}</Text>
+                  </View>
+                  <View style={styles.downPart}>
+                    <View>
+                      <HTML html={timeData} />
+                    </View>
+                    <View>
+                      <Text> </Text>
+                    </View>
+                    <View>
+                      <Text style={styles.by}>By:</Text>
+                    </View>
+                    <View>
+                      <Text> </Text>
+                    </View>
+                    <View>
+                      <Text style={styles.by}>{story.user.lastName}</Text>
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
             </View>
           );
         })
@@ -62,18 +84,48 @@ export default class HomeScreen extends Component {
     return result;
   };
 
-  // componentDidMount() {
-  //   getFeeds().then(res =>
-  //     this.setState({
-  //       data: res.data,
-  //     }),
-  //   );
-  // }
+  componentDidMount() {
+    getAd().then(res =>
+      this.setState({
+        adData: res.data,
+      }),
+    );
+  }
+
+  displayAds = data => {
+    const ads = data.map(ad => {
+      let pic = ad.picUrl;
+      return (
+        <View
+          style={{
+            height: 130,
+            width: 130,
+            marginLeft: 20,
+            borderWidth: 0.5,
+            borderColor: '#dddddd',
+          }}
+          key={ad.id}>
+          <View style={{flex: 2}}>
+            <Image
+              source={{uri: pic}}
+              style={{
+                flex: 1,
+                height: null,
+                width: null,
+                resizeMode: 'cover',
+              }}
+            />
+          </View>
+          <View style={{flex: 1, paddingLeft: 10, paddingTop: 10}}>
+            <Text>{ad.name}</Text>
+          </View>
+        </View>
+      );
+    });;
+    return ads;
+  };
   render() {
     const {data, refreshing} = this.state;
-
-    console.log("console.log", this.props.navigation.getParam('stories'));
-    console.log("data +++>>>>>>>>", data);
     return (
       <View style={styles.container}>
         <ScrollView
@@ -95,25 +147,38 @@ export default class HomeScreen extends Component {
               }}
             />
           }>
-          <View style={styles.welcomeContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                this.props.navigation.navigate('WebViewComponent');
-              }}
-              style={styles.helpLink}>
-              <Image
-                source={require('../assets/images/photo.jpg')}
-                style={styles.welcomeImage}
-              />
-            </TouchableOpacity>
+          <View style={{height: 130, marginTop: 20}}>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}>
+              {this.state.adData !== []
+                ? this.displayAds(this.state.adData)
+                : ''}
+            </ScrollView>
           </View>
           <View style={styles.getStartedContainer}>
+            <TouchableOpacity
+              onPress={() =>
+                this.props.navigation.navigate('WebViewComponent')
+              }>
             <Text style={styles.helpLinkText}>Great Educators Forum</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.helpContainer}>
             <Text>Updates</Text>
           </View>
           <View style={styles.feedContainer}>{this.displayFeed(data)}</View>
+          <View style={styles.helpContainer}>
+            {this.state.readMore ? (
+              <ReadMore />
+            ) : (
+              <Text
+                style={styles.readMoreText}
+                onPress={() => this.setState({readMore: true})}>
+                Read more
+              </Text>
+            )}
+          </View>
         </ScrollView>
       </View>
     );
@@ -167,6 +232,15 @@ const styles = StyleSheet.create({
     marginTop: 3,
     marginLeft: -10,
   },
+  advertView: {
+    margin: 20,
+  },
+  adverts: {
+    width: 180,
+    height: 140,
+    // marginTop: 3,
+    // marginLeft: -10,
+  },
   feedImage: {
     width: 100,
     height: 100,
@@ -191,6 +265,17 @@ const styles = StyleSheet.create({
     // bottom: 1,
     // paddingBottom: -100,
   },
+  downPart: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  by: {
+    fontSize: 12,
+    bottom: 0,
+    paddingBottom: 0,
+    marginTop: 3,
+    color: 'rgba(96,100,109, 1)',
+  },
   getStartedContainer: {
     alignItems: 'center',
     marginHorizontal: 50,
@@ -213,6 +298,9 @@ const styles = StyleSheet.create({
   helpContainer: {
     marginTop: 15,
     alignItems: 'center',
+  },
+  readMoreText: {
+    color: '#1E90FF',
   },
   helpLink: {
     paddingVertical: 15,

@@ -12,7 +12,15 @@ export const getFeeds = async () => {
 
 export const getFeed = async id => {
   try {
-    return axios.get(`${url2}feed${id}`);
+    return axios.get(`${url}feed${id}`);
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getAd = async () => {
+  try {
+    return axios.get(`${url}ads`);
   } catch (err) {
     return err;
   }

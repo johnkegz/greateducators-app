@@ -19,7 +19,7 @@ export class PostScreen extends Component {
           onLoad={() => {
             return this.setState({loading: false});
           }}
-          source={{uri: 'https://bio-back.herokuapp.com/'}}
+          source={{uri: 'https://bio-front.herokuapp.com/login'}}
         />
       </View>
     );
