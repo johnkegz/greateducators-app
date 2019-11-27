@@ -1,7 +1,12 @@
 import React, {Component} from 'react';
 import {Text, View} from 'react-native';
+import {connect} from 'react-redux';
 
 export class ReadMore extends Component {
+  state = {
+    data: [],
+  };
+
   displayFeed = stories => {
     const result =
       stories.length === 0 ? (
@@ -64,7 +69,12 @@ export class ReadMore extends Component {
 
     return result;
   };
+
+  componentDidMount(){
+    this.props.readMore();
+  }
   render() {
+    console.log("props +++", this.props);
     return (
       <View>
         <Text> ReadMore </Text>
@@ -73,4 +83,19 @@ export class ReadMore extends Component {
   }
 }
 
-export default ReadMore;
+function mapStateToProps(state){
+  return {
+    readMoreData: state.data,
+  };
+}
+
+function mapDispatchToProps(dispatch){
+  return {
+    readMore: () => dispatch({type: 'READ_MORE'})
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ReadMore);
