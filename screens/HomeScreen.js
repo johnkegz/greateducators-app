@@ -170,7 +170,7 @@ export default class HomeScreen extends Component {
           <View style={styles.feedContainer}>{this.displayFeed(data)}</View>
           <View style={styles.helpContainer}>
             {this.state.readMore ? (
-              <ReadMore />
+                <ReadMore />
             ) : (
               <Text
                 style={styles.readMoreText}
