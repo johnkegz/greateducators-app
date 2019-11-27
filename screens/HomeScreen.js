@@ -13,8 +13,9 @@ import {
 } from 'react-native';
 import {getFeeds, getAd} from '../APi/index';
 import ReadMore from './More';
+import {connect} from 'react-redux';
 
-export default class HomeScreen extends Component {
+class HomeScreen extends Component {
   state = {
     data: this.props.navigation.getParam('stories'),
     refreshing: false,
@@ -62,13 +63,13 @@ export default class HomeScreen extends Component {
                       <HTML html={timeData} />
                     </View>
                     <View>
-                      <Text> </Text>
+                      <Text />
                     </View>
                     <View>
                       <Text style={styles.by}>By:</Text>
                     </View>
                     <View>
-                      <Text> </Text>
+                      <Text />
                     </View>
                     <View>
                       <Text style={styles.by}>{story.user.lastName}</Text>
@@ -85,13 +86,13 @@ export default class HomeScreen extends Component {
   };
 
   componentDidMount() {
+    this.props.readMore();
     getAd().then(res =>
       this.setState({
         adData: res.data,
       }),
     );
   }
-
   displayAds = data => {
     const ads = data.map(ad => {
       let pic = ad.picUrl;
@@ -121,9 +122,11 @@ export default class HomeScreen extends Component {
           </View>
         </View>
       );
-    });;
+    });
     return ads;
   };
+
+
   render() {
     const {data, refreshing} = this.state;
     return (
@@ -161,7 +164,7 @@ export default class HomeScreen extends Component {
               onPress={() =>
                 this.props.navigation.navigate('WebViewComponent')
               }>
-            <Text style={styles.helpLinkText}>Great Educators Forum</Text>
+              <Text style={styles.helpLinkText}>Great Educators Forum</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.helpContainer}>
@@ -170,7 +173,7 @@ export default class HomeScreen extends Component {
           <View style={styles.feedContainer}>{this.displayFeed(data)}</View>
           <View style={styles.helpContainer}>
             {this.state.readMore ? (
-                <ReadMore />
+              <ReadMore />
             ) : (
               <Text
                 style={styles.readMoreText}
@@ -185,9 +188,26 @@ export default class HomeScreen extends Component {
   }
 }
 
-HomeScreen.navigationOptions = {
-  header: null,
-};
+// HomeScreen.navigationOptions = {
+//   header: null,
+// };
+
+function mapStateToProps(state) {
+  return {
+    readMoreData: state.data,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    readMore: () => dispatch({type: 'READ_MORE', data: 'yooooo'}),
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {

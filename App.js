@@ -14,13 +14,19 @@ import {createStore} from 'redux';
 
 const initialState = {
   data: [],
+  isAuthenticated: false,
 };
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'READ_MORE':
       return {
         ...state,
-        data: [{key: 'value'}],
+        data: [{key: action.data}],
+      };
+    case 'LOGIN':
+      return {
+        ...state,
+        isAuthenticated: action.data,
       };
   }
   return state;

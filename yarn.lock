@@ -5488,6 +5488,11 @@ react-native-tab-view@^2.9.0:
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-2.10.0.tgz#5e249e5650502010013449ffd4e5edc18a95364b"
   integrity sha512-qgexVz5eO4yaFjdkmn/sURXgVvaBo6pZD/q1eoca96SbPVbaH3WzVhF3bRUfeTHwZkXwznFTpS3JURqIFU8vQA==
 
+react-native-validate-form@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/react-native-validate-form/-/react-native-validate-form-1.1.3.tgz#5266a6624fdba11d9867a95fa12a270b561fda77"
+  integrity sha512-7OTQaGPbOImI9RY4IjdKDFEAbYCuQjIUFAT9KDFp5TTVUx/MH4qMdlM7jOaoOPjU9TNERXIjYoOYPun1dbrQGw==
+
 react-native-vector-icons@^6.6.0:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-6.6.0.tgz#66cf004918eb05d90778d64bd42077c1800d481b"

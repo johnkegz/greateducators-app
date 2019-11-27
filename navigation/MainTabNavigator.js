@@ -11,6 +11,7 @@ import HomeScreen from '../screens/HomeScreen';
 import ContentScreen from '../screens/ContentScreen';
 import WebViewComponent from '../screens/WebViewComponent';
 import PostScreen from '../screens/PostScreen';
+import LoginScreen from '../screens/LoginScreen';
 // import RouteConfigs from './Routes';
 
 const config = Platform.select({
@@ -28,7 +29,8 @@ const HomeStack = createStackNavigator(
 );
 const postFeedStack = createStackNavigator(
   {
-    Post: PostScreen,
+    // Post: PostScreen,
+    Login: LoginScreen,
     // Content: ContentScreen,
     // WebViewComponent: WebViewComponent,
   },
