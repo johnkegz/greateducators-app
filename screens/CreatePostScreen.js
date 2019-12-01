@@ -1,39 +1,3 @@
-// import React, {Component} from 'react';
-// import {Text, View} from 'react-native';
-// import {WebView} from 'react-native-webview';
-
-// export class WebViewComponent extends Component {
-//   state = {
-//     loading: true,
-//   };
-
-//   render() {
-//     const {loading} = this.state;
-//     return (
-//       <View style={{flex: 1}}>
-//         {loading ? (
-//           <Text>Loading ............</Text>
-//         ) : (
-//           <Text style={{marginTop: -20}} />
-//         )}
-//         <WebView
-//           onLoad={() => {
-//             return this.setState({loading: false});
-//           }}
-//           source={{uri: 'http://greateducatorsug.org/'}}
-//         />
-//       </View>
-//     );
-//   }
-// }
-
-// export default WebViewComponent;
-
-/**
- * Rich Editor Example
- * @author tangzehua
- * @since 2019-06-24 14:52
- */
 import React from 'react';
 import {
   Button,
@@ -51,8 +15,10 @@ import {RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
 import ImagePicker from 'react-native-image-picker';
 var CryptoJS = require('crypto-js');
 import {Form, Field} from 'react-native-validate-form';
+import {submitStory} from './Auth/Api';
+import {connect} from 'react-redux';
 
-const initHTML = '<br/></br>';
+const initHTML = '<b/></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>';
 
 const required = value => (value ? undefined : 'This is a required field.');
 const email = value =>
@@ -60,28 +26,15 @@ const email = value =>
     ? 'Please provide a valid email address.'
     : undefined;
 
-class WebViewComponent extends React.Component {
+class CreatePostScreen extends React.Component {
   initialState = {
-    email: '',
-    password: '',
+    title: '',
+    picUrl: '',
+    UserId: this.props.loginData.id,
+    fileName: 'Choose image for story',
+    imageUploadStatus: false,
   };
   state = this.initialState;
-  save = async () => {
-    // Get the data here and call the interface to save the data
-    let html = await this.richText.getContentHtml();
-    // console.log(html);
-    alert(html);
-  };
-
-  onPressAddImage = () => {
-    // insert URL
-    this.richText.insertImage(
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1024px-React-icon.svg.png',
-    );
-    // insert base64
-    // this.richText.insertImage(`data:${image.mime};base64,${image.data}`);
-    this.richText.blurContentEditor();
-  };
 
   onHome = () => {
     this.props.navigation.push('index');
@@ -90,11 +43,9 @@ class WebViewComponent extends React.Component {
   handleImagePicker() {
     const options = {};
     ImagePicker.launchImageLibrary(options, response => {
-      console.log('response  +++++++', response);
-      alert(JSON.stringify(response));
+      this.setState({fileName: response.fileName});
       this.uploadImage(response);
     });
-    // return true
   }
 
   submitForm() {
@@ -109,15 +60,26 @@ class WebViewComponent extends React.Component {
     this.setState({errors: errors});
   }
 
-  submitSuccess() {
-    this.props.login(this.state);
+  async submitSuccess() {
+    let html = await this.richText.getContentHtml();
+    const {title, picUrl, UserId} = this.state;
+    const data = {
+      title: title,
+      feed: html,
+      picUrl: picUrl,
+      UserId: UserId,
+    };
+    // console.log("data to be submittedd +++++++", this.richText)
+    submitStory(data);
     this.setState(this.initialState);
+    this.props.navigation.navigate('Login');
+    // await this.richText.getContentHtml() = '<b/></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>';
   }
 
   submitFailed() {
     console.log('Submit Faield!');
   }
-  displayForm(email, password) {
+  displayForm() {
     return (
       <View>
         <Form
@@ -129,50 +91,32 @@ class WebViewComponent extends React.Component {
           <Field
             required
             component={InputField}
-            validations={[required, email]}
-            name="email"
-            value={this.state.email}
-            onChangeText={val => this.setState({email: val})}
-            customStyle={{width: 100}}
-          />
-          <Field
-            required
-            component={InputField}
             validations={[required]}
-            name="password"
-            value={this.state.password}
-            onChangeText={val => this.setState({password: val})}
-            customStyle={{width: 100}}
-            secureTextEntry={true}
+            name="title"
+            value={this.state.title}
+            onChangeText={val => this.setState({title: val})}
+            customStyle={{backgroundColor: '#F5FCFF'}}
+            placeholder={'enter title'}
           />
         </Form>
-
-        <TouchableOpacity onPress={this.submitForm.bind(this)}>
-          <Text>SUBMIT</Text>
-        </TouchableOpacity>
       </View>
     );
   }
-
   uploadImage(response) {
+    this.setState({imageUploadStatus: true});
     let timestamp = ((Date.now() / 1000) | 0).toString();
     let api_key = '493371531433662';
     let api_secret = 'lkfb2Lho8PskN5AraYHe3W1gR6E';
-    // let cloud = 'dar5ymd2m';
     let hash_string = 'timestamp=' + timestamp + api_secret;
     let signature = CryptoJS.SHA1(hash_string).toString();
     let upload_url = 'https://api.cloudinary.com/v1_1/dar5ymd2m/upload';
-    // let imageType = 'image/jpg' || 'image/jpeg' || 'image/png';
 
     let xhr = new XMLHttpRequest();
     xhr.open('POST', upload_url);
     xhr.onload = () => {
-      console.log(xhr);
-    };
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState == XMLHttpRequest.DONE) {
-        alert(xhr.responseText);
-      }
+      const data = JSON.parse(xhr._response);
+      const pic = data.secure_url;
+      this.setState({picUrl: pic, imageUploadStatus: false});
     };
     let formdata = new FormData();
     formdata.append('file', {
@@ -188,32 +132,41 @@ class WebViewComponent extends React.Component {
 
   render() {
     let that = this;
-    const {password} = this.state;
+    console.log('state in progress ++++++++', this.state);
+    console.log("tjhat >>?>>>>>>>>>>>>?>?>?>?>?>", that)
     return (
       <SafeAreaView style={styles.container}>
         <View>
-          <Text> CreatePostScreen </Text>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('LogOut')}>
-            <Text>Log out</Text>
-          </TouchableOpacity>
-          {/* <MarkdownEditor /> */}
-          <View>
+          <Text> Create a Story </Text>
+        </View>
+        <View style={styles.logOut}>
+          <Button
+            title="Log out"
+            onPress={() => this.props.navigation.navigate('LogOut')}
+          />
+          <View style={styles.nav}>
+          {/* <Button title="Save" onPress={that.save}  onPress={this.submitForm.bind(this)}/> */}
             <Button
-              onPress={() => this.handleImagePicker()}
-              title="Choose image"
+              title="Save"
+              onPress={this.submitForm.bind(this)}
+              disabled={this.state.imageUploadStatus ? true : false}
             />
-          </View>
         </View>
-
-      {/**title */}
-        <View>{this.displayForm(email, password)}</View>
-      {/**end of title */}
-
-
-        <View style={styles.nav}>
-          <Button title="Save" onPress={that.save} />
         </View>
+        {/* <MarkdownEditor /> */}
+        <View style={styles.uploadButtom}>
+          <Button
+            onPress={() => this.handleImagePicker()}
+            title={this.state.fileName}
+            disabled={this.state.imageUploadStatus ? true : false}
+          />
+        </View>
+        {/* </View> */}
+
+        {/**title */}
+        <View style={styles.title}>{this.displayForm()}</View>
+        {/**end of title */}
+
         <ScrollView style={styles.scroll}>
           <RichEditor
             ref={rf => (that.richText = rf)}
@@ -226,9 +179,8 @@ class WebViewComponent extends React.Component {
             style={styles.richBar}
             getEditor={() => that.richText}
             iconTint={'#000033'}
-            selectedIconTint={'#2095F2'}
+            // selectedIconTint={'#2095F2'}
             selectedButtonStyle={{backgroundColor: 'transparent'}}
-            onPressAddImage={that.onPressAddImage}
           />
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -239,29 +191,58 @@ class WebViewComponent extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5FCFF',
+    paddingTop: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
   },
   nav: {
     flexDirection: 'row',
+    // justifyContent: 'space-between',
+    // marginHorizontal: 5,
+  },
+  uploadButtom:{
+    marginVertical: 5,
+  },
+  logOut: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: 5,
+    // marginHorizontal: ,
+    marginVertical: 2,
   },
   rich: {
-    minHeight: 300,
+    minHeight: 320,
     flex: 1,
   },
   richBar: {
-    height: 50,
+    height: 35,
     backgroundColor: '#F5FCFF',
   },
   scroll: {
     backgroundColor: '#ffffff',
   },
+  title:{
+    marginBottom: 5,
+  }
 });
 
-export default WebViewComponent;
+// export default CreatePostScreen;
+function mapStateToProps(state) {
+  console.log('create post_0000000000000000000', state);
+  return {
+    loginData: state.user,
+  };
+}
 
+function mapDispatchToProps(dispatch) {
+  return {
+   
+  };
+}
 
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(CreatePostScreen);
 
 //input feild
 const InputField = ({

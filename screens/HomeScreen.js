@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
   RefreshControl,
+  Linking,
 } from 'react-native';
 import {getFeeds, getAd} from '../APi/index';
 import ReadMore from './More';
@@ -161,9 +162,7 @@ class HomeScreen extends Component {
           </View>
           <View style={styles.getStartedContainer}>
             <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate('WebViewComponent')
-              }>
+              onPress={ ()=> Linking.openURL('http://greateducatorsug.org/') }>
               <Text style={styles.helpLinkText}>Great Educators Forum</Text>
             </TouchableOpacity>
           </View>
@@ -171,7 +170,7 @@ class HomeScreen extends Component {
             <Text>Updates</Text>
           </View>
           <View style={styles.feedContainer}>{this.displayFeed(data)}</View>
-          <View style={styles.helpContainer}>
+          {/* <View style={styles.helpContainer}>
             {this.state.readMore ? (
               <ReadMore />
             ) : (
@@ -181,7 +180,7 @@ class HomeScreen extends Component {
                 Read more
               </Text>
             )}
-          </View>
+          </View> */}
         </ScrollView>
       </View>
     );

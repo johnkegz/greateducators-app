@@ -3,11 +3,24 @@ import {connect} from 'react-redux';
 // import {login} from '../../redux/actions/actions';
 // import {NavLink} from 'react-router-dom';
 // import '../Regisiter/register.scss';
-import {Text, View, TextInput, TouchableOpacity} from 'react-native';
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Button,
+} from 'react-native';
 import {Form, Field} from 'react-native-validate-form';
+import {login} from './Auth/Api';
+import {auth} from './Auth/auth';
+import {AsyncStorage} from 'react-native';
 
 const required = value => (value ? undefined : 'This is a required field.');
-const email = value => value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,5}$/i.test(value) ? 'Please provide a valid email address.' : undefined;
+const email = value =>
+  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,5}\s*$/i.test(value)
+    ? 'Please provide a valid email address'
+    : undefined;
 
 class LoginScreen extends Component {
   initialState = {
@@ -16,16 +29,27 @@ class LoginScreen extends Component {
   };
   state = this.initialState;
   static getDerivedStateFromProps(props, state) {
-    if (props.isAuthenticated) {
-      props.navigation.navigate('Post');
+    console.log('get derived state from props>>>>', props.loginData);
+    if (
+      props.loginData !== undefined &&
+      Object.keys(props.loginData).length !== 0 &&
+      props.loginData.constructor === Object
+    ) {
+      props.navigation.navigate('CreatePost');
     }
+    return null;
   }
 
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.login(this.state);
-    this.setState(this.initialState);
+  _bootstrapAsync = async () => {
+    const userToken = await AsyncStorage.getItem('jwtToken');
+    return userToken;
   };
+
+  // handleSubmit = e => {
+  //   e.preventDefault();
+  //   this.props.login(this.state);
+  //   this.setState(this.initialState);
+  // };
 
   submitForm() {
     let submitResults = this.myForm.validate();
@@ -33,24 +57,28 @@ class LoginScreen extends Component {
     let errors = [];
 
     submitResults.forEach(item => {
-      errors.push({ field: item.fieldName, error: item.error });
+      errors.push({field: item.fieldName, error: item.error});
     });
 
-    this.setState({ errors: errors });
+    this.setState({errors: errors});
   }
 
   submitSuccess() {
-    console.log("Submit Success!");
+    this.props.login(this.state);
+    this.setState(this.initialState);
   }
 
   submitFailed() {
-    console.log("Submit Faield!");
+    console.log('Submit Faield!');
   }
-  displayForm(email,password) {
+  displayForm(email, password) {
     return (
       <View>
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>Login</Text>
+      </View>
         <Form
-          ref={(ref) => this.myForm = ref}
+          ref={ref => (this.myForm = ref)}
           validate={true}
           submit={this.submitSuccess.bind(this)}
           failed={this.submitFailed.bind(this)}
@@ -61,8 +89,9 @@ class LoginScreen extends Component {
             validations={[required, email]}
             name="email"
             value={this.state.email}
-            onChangeText={(val) => this.setState({ email: val })}
-            customStyle={{width: 100}}
+            onChangeText={val => this.setState({email: val})}
+            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20,}}
+            placeholder={'Enter email'}
           />
           <Field
             required
@@ -70,23 +99,26 @@ class LoginScreen extends Component {
             validations={[required]}
             name="password"
             value={this.state.password}
-            onChangeText={(val) => this.setState({ password: val })}
-            customStyle={{width: 100}}
+            onChangeText={val => this.setState({password: val})}
+            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20,}}
             secureTextEntry={true}
-            
+            placeholder={'Enter password'}
           />
         </Form>
-
-        <TouchableOpacity onPress={this.submitForm.bind(this)}>
-          <Text>SUBMIT</Text>
-        </TouchableOpacity>
+        <View style={styles.submitButton}>
+          <Button title="SUBMIT" onPress={this.submitForm.bind(this)}></Button>
+        </View>
+        <View>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate('Register')}>
+            <Text>Register</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
   render() {
     const {password} = this.state;
-    console.log('state++++', this.state);
-    return <View>{this.displayForm(email,password)}</View>;
+    return <View style={styles.container}>{this.displayForm(email, password)}</View>;
   }
 }
 //input feild
@@ -99,40 +131,50 @@ const InputField = ({
   placeholder,
   errors,
   secureTextEntry,
-   // this array prop is automatically passed down to this component from <Form />
+  // this array prop is automatically passed down to this component from <Form />
 }) => {
   return (
     <View>
       <TextInput
         value={value && value}
-        onChangeText={onChangeText ? (val) => onChangeText(val) : null}
-        placeholder={placeholder ? placeholder : ""}
+        onChangeText={onChangeText ? val => onChangeText(val) : null}
+        placeholder={placeholder ? placeholder : ''}
         disabled={disabled}
         style={customStyle ? customStyle : {}}
         secureTextEntry={secureTextEntry ? secureTextEntry : false}
       />
 
-      { errors && errors.length > 0 && errors.map((item, index) =>
-          item.field === name && item.error ?
-            <Text style={{ color: 'red' }}>
+      {errors &&
+        errors.length > 0 &&
+        errors.map((item, index) =>
+          item.field === name && item.error ? (
+            <Text style={{color: 'red'}} key={index}>
               {item.error}
             </Text>
-          : <View />
-        )
-      }
+          ) : (
+            <View key={index} />
+          ),
+        )}
     </View>
   );
-}
+};
 function mapStateToProps(state) {
+  console.log('user state global state__+_+__+_+_+_+_+_+_0000000000000000000', state);
   return {
-    isAuthenticated: state.isAuthenticated,
+    loginData: state.user,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    readMore: () => {
-      dispatch({type: 'LOGIN', data: false});
+    login: data => {
+      login(data).then(res => {
+        console.log("first response ++", res)
+        auth(res).then(response => {
+          console.log('response ++++', response);
+          dispatch({type: 'LOGIN', data: response});
+        });
+      });
     },
   };
 }
@@ -141,3 +183,17 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(LoginScreen);
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+  },
+  submitButton: {
+    marginVertical: 40,
+  },
+  register: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
+});

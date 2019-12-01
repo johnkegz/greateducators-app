@@ -14,7 +14,7 @@ import {createStore} from 'redux';
 
 const initialState = {
   data: [],
-  isAuthenticated: false,
+  user: {},
 };
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -26,7 +26,13 @@ const reducer = (state = initialState, action) => {
     case 'LOGIN':
       return {
         ...state,
-        isAuthenticated: action.data,
+        user: action.data,
+      };
+    case 'LOGOUT':
+      console.log('data cleared++++++++++++++');
+      return {
+        ...state,
+        user: {},
       };
   }
   return state;
