@@ -1,3 +1,6 @@
+if (__DEV__) {
+  import('./ReactotronConfig').then(() => console.log('Reactotron Configured'))
+}
 /**
  * @format
  */
@@ -11,6 +14,8 @@ YellowBox.ignoreWarnings([
   'Warning: componentWillMount has been renamed, and is not recommended for use',
   'Warning: componentWillReceiveProps has been renamed, and is not recommended for use',
   'Module RCTImageLoader requires',
+  'source.uri should not be an empty string',
+  'Warning: AsyncStorage has been extracted from react-native core and will be removed in a future release.',
 ]);
 
 AppRegistry.registerComponent(appName, () => App);

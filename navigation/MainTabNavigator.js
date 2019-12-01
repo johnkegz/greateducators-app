@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform} from 'react-native';
+import {Platform, AsyncStorage} from 'react-native';
 // import {createBottomTabNavigator} from 'react-navigation';
 import {createBottomTabNavigator, BottomTabBar} from 'react-navigation-tabs';
 import {createStackNavigator} from 'react-navigation-stack';
@@ -11,6 +11,10 @@ import HomeScreen from '../screens/HomeScreen';
 import ContentScreen from '../screens/ContentScreen';
 import WebViewComponent from '../screens/WebViewComponent';
 import PostScreen from '../screens/PostScreen';
+import LoginScreen from '../screens/LoginScreen';
+import CreatePostScreen from '../screens/CreatePostScreen';
+import LogOutScreen from '../screens/LogOut';
+import RegisterScreen from '../screens/RegisterScreen';
 // import RouteConfigs from './Routes';
 
 const config = Platform.select({
@@ -23,13 +27,16 @@ const HomeStack = createStackNavigator(
     Home: HomeScreen,
     Content: ContentScreen,
     WebViewComponent: WebViewComponent,
+    CreatePost: CreatePostScreen,
+    Register: RegisterScreen,
   },
   config,
 );
 const postFeedStack = createStackNavigator(
   {
-    Post: PostScreen,
-    // Content: ContentScreen,
+    // Post: PostScreen,
+    Login: LoginScreen,
+    LogOut: LogOutScreen,
     // WebViewComponent: WebViewComponent,
   },
   config,
@@ -43,7 +50,19 @@ HomeStack.navigationOptions = {
 //Post stack
 postFeedStack.navigationOptions = {
   tabBarLabel: 'Post',
-  tabBarIcon: ({focused}) => <Icon name="ios-add-circle" size={30} color="#4F8EF7" />,
+  tabBarIcon: ({focused}) => (
+    <Icon name="ios-add-circle" size={30} color="#4F8EF7" />
+  ),
+  tabBarOnPress: ({navigation, defaultHandler}) => {
+    // AsyncStorage.setItem('userToken', 'sdsdsdsd');
+    AsyncStorage.getItem('jwtToken').then(res => {
+      if (res) {
+        navigation.navigate('CreatePost');
+      } else {
+        navigation.navigate('Login');
+      }
+    });
+  },
 };
 postFeedStack.path = '';
 HomeStack.path = '';

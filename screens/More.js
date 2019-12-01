@@ -70,9 +70,6 @@ export class ReadMore extends Component {
     return result;
   };
 
-  componentDidMount(){
-    this.props.readMore();
-  }
   render() {
     console.log("props +++", this.props);
     return (
@@ -83,15 +80,15 @@ export class ReadMore extends Component {
   }
 }
 
-function mapStateToProps(state){
+function mapStateToProps(state) {
   return {
     readMoreData: state.data,
   };
 }
 
-function mapDispatchToProps(dispatch){
+function mapDispatchToProps(dispatch) {
   return {
-    readMore: () => dispatch({type: 'READ_MORE'})
+    readMore: () => dispatch({type: 'READ_MORE'}),
   };
 }
 
