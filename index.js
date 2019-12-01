@@ -16,6 +16,7 @@ YellowBox.ignoreWarnings([
   'Module RCTImageLoader requires',
   'source.uri should not be an empty string',
   'Warning: AsyncStorage has been extracted from react-native core and will be removed in a future release.',
+  'Warning: Each child in a list should have a unique "key" prop."',
 ]);
 
 AppRegistry.registerComponent(appName, () => App);

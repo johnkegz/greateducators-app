@@ -29,7 +29,6 @@ const reducer = (state = initialState, action) => {
         user: action.data,
       };
     case 'LOGOUT':
-      console.log('data cleared++++++++++++++');
       return {
         ...state,
         user: {},

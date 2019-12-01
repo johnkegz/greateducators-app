@@ -6,7 +6,6 @@ export const auth = async response => {
     if (response.data.token === undefined) {
       return false;
     } else if (response === 'Request failed with status code 404') {
-      console.log('response auth ++++++++++', response);
       return 'login failed';
     } else {
       await AsyncStorage.setItem('jwtToken', response.data.token);

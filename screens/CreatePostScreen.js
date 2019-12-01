@@ -18,7 +18,8 @@ import {Form, Field} from 'react-native-validate-form';
 import {submitStory} from './Auth/Api';
 import {connect} from 'react-redux';
 
-const initHTML = '<b/></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>';
+const initHTML =
+  '<b/></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>';
 
 const required = value => (value ? undefined : 'This is a required field.');
 const email = value =>
@@ -35,6 +36,13 @@ class CreatePostScreen extends React.Component {
     imageUploadStatus: false,
   };
   state = this.initialState;
+
+  static getDerivedStateFromProps(props, state) {
+    if (state.UserId === undefined) {
+      return props.navigation.navigate('LogOut');
+    }
+    return null;
+  }
 
   onHome = () => {
     this.props.navigation.push('index');
@@ -69,11 +77,8 @@ class CreatePostScreen extends React.Component {
       picUrl: picUrl,
       UserId: UserId,
     };
-    // console.log("data to be submittedd +++++++", this.richText)
     submitStory(data);
     this.setState(this.initialState);
-    this.props.navigation.navigate('Login');
-    // await this.richText.getContentHtml() = '<b/></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>';
   }
 
   submitFailed() {
@@ -97,43 +102,46 @@ class CreatePostScreen extends React.Component {
             onChangeText={val => this.setState({title: val})}
             customStyle={{backgroundColor: '#F5FCFF'}}
             placeholder={'enter title'}
+            maxLength={111}
           />
         </Form>
       </View>
     );
   }
   uploadImage(response) {
-    this.setState({imageUploadStatus: true});
-    let timestamp = ((Date.now() / 1000) | 0).toString();
-    let api_key = '493371531433662';
-    let api_secret = 'lkfb2Lho8PskN5AraYHe3W1gR6E';
-    let hash_string = 'timestamp=' + timestamp + api_secret;
-    let signature = CryptoJS.SHA1(hash_string).toString();
-    let upload_url = 'https://api.cloudinary.com/v1_1/dar5ymd2m/upload';
+    if (response.didCancel) {
+      return null;
+    } else {
+      this.setState({imageUploadStatus: true});
+      let timestamp = ((Date.now() / 1000) | 0).toString();
+      let api_key = '493371531433662';
+      let api_secret = 'lkfb2Lho8PskN5AraYHe3W1gR6E';
+      let hash_string = 'timestamp=' + timestamp + api_secret;
+      let signature = CryptoJS.SHA1(hash_string).toString();
+      let upload_url = 'https://api.cloudinary.com/v1_1/dar5ymd2m/upload';
 
-    let xhr = new XMLHttpRequest();
-    xhr.open('POST', upload_url);
-    xhr.onload = () => {
-      const data = JSON.parse(xhr._response);
-      const pic = data.secure_url;
-      this.setState({picUrl: pic, imageUploadStatus: false});
-    };
-    let formdata = new FormData();
-    formdata.append('file', {
-      uri: response.uri,
-      type: response.type,
-      name: response.fileName,
-    });
-    formdata.append('timestamp', timestamp);
-    formdata.append('api_key', api_key);
-    formdata.append('signature', signature);
-    xhr.send(formdata);
+      let xhr = new XMLHttpRequest();
+      xhr.open('POST', upload_url);
+      xhr.onload = () => {
+        const data = JSON.parse(xhr._response);
+        const pic = data.secure_url;
+        this.setState({picUrl: pic, imageUploadStatus: false});
+      };
+      let formdata = new FormData();
+      formdata.append('file', {
+        uri: response.uri,
+        type: response.type,
+        name: response.fileName,
+      });
+      formdata.append('timestamp', timestamp);
+      formdata.append('api_key', api_key);
+      formdata.append('signature', signature);
+      xhr.send(formdata);
+    }
   }
 
   render() {
     let that = this;
-    console.log('state in progress ++++++++', this.state);
-    console.log("tjhat >>?>>>>>>>>>>>>?>?>?>?>?>", that)
     return (
       <SafeAreaView style={styles.container}>
         <View>
@@ -145,19 +153,23 @@ class CreatePostScreen extends React.Component {
             onPress={() => this.props.navigation.navigate('LogOut')}
           />
           <View style={styles.nav}>
-          {/* <Button title="Save" onPress={that.save}  onPress={this.submitForm.bind(this)}/> */}
+            {/* <Button title="Save" onPress={that.save}  onPress={this.submitForm.bind(this)}/> */}
             <Button
               title="Save"
               onPress={this.submitForm.bind(this)}
               disabled={this.state.imageUploadStatus ? true : false}
             />
-        </View>
+          </View>
         </View>
         {/* <MarkdownEditor /> */}
         <View style={styles.uploadButtom}>
           <Button
             onPress={() => this.handleImagePicker()}
-            title={this.state.fileName}
+            title={
+              this.state.fileName === undefined
+                ? 'Choose image for story'
+                : this.state.fileName
+            }
             disabled={this.state.imageUploadStatus ? true : false}
           />
         </View>
@@ -200,7 +212,7 @@ const styles = StyleSheet.create({
     // justifyContent: 'space-between',
     // marginHorizontal: 5,
   },
-  uploadButtom:{
+  uploadButtom: {
     marginVertical: 5,
   },
   logOut: {
@@ -220,23 +232,20 @@ const styles = StyleSheet.create({
   scroll: {
     backgroundColor: '#ffffff',
   },
-  title:{
+  title: {
     marginBottom: 5,
-  }
+  },
 });
 
 // export default CreatePostScreen;
 function mapStateToProps(state) {
-  console.log('create post_0000000000000000000', state);
   return {
     loginData: state.user,
   };
 }
 
 function mapDispatchToProps(dispatch) {
-  return {
-   
-  };
+  return {};
 }
 
 export default connect(
@@ -254,6 +263,7 @@ const InputField = ({
   placeholder,
   errors,
   secureTextEntry,
+  maxLength,
   // this array prop is automatically passed down to this component from <Form />
 }) => {
   return (
@@ -265,6 +275,7 @@ const InputField = ({
         disabled={disabled}
         style={customStyle ? customStyle : {}}
         secureTextEntry={secureTextEntry ? secureTextEntry : false}
+        maxLength={maxLength ? maxLength : null}
       />
 
       {errors &&

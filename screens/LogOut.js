@@ -12,7 +12,6 @@ class LogOutScreen extends Component {
     this.signOutAsync();
   }
   render() {
-    console.log('log out props +++++', this.props);
     return (
       <View>
         <Text>Log out</Text>

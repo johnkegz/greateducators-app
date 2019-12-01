@@ -69,7 +69,6 @@ class WebViewComponent extends React.Component {
   save = async () => {
     // Get the data here and call the interface to save the data
     let html = await this.richText.getContentHtml();
-    // console.log(html);
     alert(html);
   };
 
@@ -90,7 +89,6 @@ class WebViewComponent extends React.Component {
   handleImagePicker() {
     const options = {};
     ImagePicker.launchImageLibrary(options, response => {
-      console.log('response  +++++++', response);
       alert(JSON.stringify(response));
       this.uploadImage(response);
     });
