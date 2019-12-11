@@ -29,7 +29,6 @@ class LoginScreen extends Component {
   };
   state = this.initialState;
   static getDerivedStateFromProps(props, state) {
-    console.log('get derived state from props>>>>', props.loginData);
     if (
       props.loginData !== undefined &&
       Object.keys(props.loginData).length !== 0 &&
@@ -110,7 +109,7 @@ class LoginScreen extends Component {
         </View>
         <View>
           <TouchableOpacity onPress={() => this.props.navigation.navigate('Register')}>
-            <Text>Register</Text>
+            <Text style={{color: "#1E90FF"}}>Register</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -169,9 +168,7 @@ function mapDispatchToProps(dispatch) {
   return {
     login: data => {
       login(data).then(res => {
-        console.log("first response ++", res)
         auth(res).then(response => {
-          console.log('response ++++', response);
           dispatch({type: 'LOGIN', data: response});
         });
       });

@@ -32,16 +32,6 @@ class RegisterScreen extends Component {
     confirmPassword: '',
   };
   state = this.initialState;
-  //   static getDerivedStateFromProps(props, state) {
-  //     console.log('get derived state from props>>>>', props.registerData);
-  //     if (
-  //       props.registerData !== undefined &&
-  //       Object.keys(props.registerData).length !== 0 &&
-  //       props.registerData.constructor === Object
-  //     ) {
-  //       props.navigation.navigate('CreatePost');
-  //     }
-  //   }
 
   _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem('jwtToken');
@@ -66,9 +56,21 @@ class RegisterScreen extends Component {
     this.setState({errors: errors});
   }
 
+  checkPassword() {
+    if (this.state.password === this.state.confirmPassword) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   submitSuccess() {
-    console.log('props ++++======+++++=====+=+', this.props.register);
-    this.props.register(this.state, this.props.navigation);
+    if (this.checkPassword() === true) {
+      return this.props.register(this.state, this.props.navigation);
+    } else {
+      return alert('passwords do not match')
+    }
+
     // this.setState(this.initialState);
   }
 
@@ -78,6 +80,9 @@ class RegisterScreen extends Component {
   displayForm(email, password) {
     return (
       <ScrollView>
+        <View>
+          <Text>Register</Text>
+        </View>
         <View>
           <Form
             ref={ref => (this.myForm = ref)}
@@ -196,21 +201,13 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     register: (data, navigation) => {
-        console.log("here +++++");
       register(data).then(res => {
-        console.log('register response ++', res.data);
-        if(res.data === "Registration successful"){
-            alert("Registration successful");
-            navigation.navigate('Login');
-            p
+        if (res.data === 'Registration successful') {
+          alert('Registration successful');
+          navigation.navigate('Login');
+        } else if (res.data === 'email already exists') {
+          alert('email already exists please use another email');
         }
-        else if(res.data === 'email already exists'){
-            alert('email already exists please use another email');
-        }
-        // auth(res).then(response => {
-        //   console.log('response register ++++', response);
-        //   dispatch({type: 'REGITER', data: res});
-        // });
       });
     },
   };

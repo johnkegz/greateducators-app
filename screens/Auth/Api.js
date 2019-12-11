@@ -16,7 +16,10 @@ export const submitStory = data => {
   return axios
     .post('https://bio-back.herokuapp.com/feed', data)
     .then(response => response)
-    .then(res => res)
+    .then(res => {
+      alert('Story created');
+      return res;
+    })
     .catch(e => {
       const error = e;
       alert('Story was not created please try again');
@@ -25,7 +28,6 @@ export const submitStory = data => {
 };
 
 export const register = data => {
-  console.log('here ++++++ api ++++');
   return axios
     .post('https://bio-back.herokuapp.com/user/register', data)
     .then(response => response)
