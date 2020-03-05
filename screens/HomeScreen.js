@@ -15,15 +15,18 @@ import {
 import {getFeeds, getAd} from '../APi/index';
 import ReadMore from './More';
 import {connect} from 'react-redux';
+import Reactotron from 'reactotron-react-native';
 
 class HomeScreen extends Component {
   state = {
-    data: this.props.navigation.getParam('stories'),
+    data: this.props.stories.data,
     refreshing: false,
     adData: [],
     readMore: false,
   };
   displayFeed = stories => {
+    Reactotron.log("stories ++++++++++", stories.data);
+    Reactotron.log("data +++}}}}}}", this.state.data);
     const result =
       stories.length === 0 ? (
         <View style={{alignItems: 'center'}}>
