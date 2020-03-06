@@ -7,6 +7,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import {getFeeds} from '../APi/index';
 import SplashScreen from './SplashScreen';
 import Reactotron from 'reactotron-react-native';
+import {createDrawerNavigator} from '@react-navigation/drawer';
 
 const Stack = createStackNavigator();
 
@@ -49,13 +50,15 @@ export default function Routes(props) {
     );
   };
 
+  const Drawer = createDrawerNavigator();
+
   useEffect(() => {
     async function f() {
       const data = await performTimeConsumingTask();
       Reactotron.log('>>>>>>>>>>>>>>>>>', data);
-    //   if (data !== null) {
-    //     setData(data);
-    //   }
+      //   if (data !== null) {
+      //     setData(data);
+      //   }
     }
     f();
     return true;
