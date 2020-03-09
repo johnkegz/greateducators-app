@@ -19,14 +19,13 @@ import Reactotron from 'reactotron-react-native';
 
 class HomeScreen extends Component {
   state = {
-    data: this.props.stories.data,
+    data: this.props.stories ? this.props.stories : [],
     refreshing: false,
     adData: [],
     readMore: false,
   };
+  // Reactotron.log("data +++}}}}}}", this.props);
   displayFeed = stories => {
-    Reactotron.log("stories ++++++++++", stories.data);
-    Reactotron.log("data +++}}}}}}", this.state.data);
     const result =
       stories.length === 0 ? (
         <View style={{alignItems: 'center'}}>
@@ -130,7 +129,6 @@ class HomeScreen extends Component {
     return ads;
   };
 
-
   render() {
     const {data, refreshing} = this.state;
     return (
@@ -165,7 +163,7 @@ class HomeScreen extends Component {
           </View>
           <View style={styles.getStartedContainer}>
             <TouchableOpacity
-              onPress={ ()=> Linking.openURL('http://greateducatorsug.org/') }>
+              onPress={() => Linking.openURL('http://greateducatorsug.org/')}>
               <Text style={styles.helpLinkText}>Great Educators Forum</Text>
             </TouchableOpacity>
           </View>
@@ -206,10 +204,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(HomeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -232,7 +227,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    shadowOffset: {
+    shadowOffset: { 
       height: 1,
       width: 1,
     },

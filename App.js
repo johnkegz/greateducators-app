@@ -11,6 +11,20 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createDrawerNavigator} from '@react-navigation/drawer';
+import {Provider} from 'react-redux';
+import {createStore} from 'redux';
+import Reactotron from 'reactotron-react-native';
+
+import HomeScreen from './screens/HomeScreen';
+import {getFeeds} from './APi/index';
+// import ContentScreen from '../screens/ContentScreen';
+// import WebViewComponent from '../screens/WebViewComponent';
+// import PostScreen from '../screens/PostScreen';
+// import LoginScreen from '../screens/LoginScreen';
+// import CreatePostScreen from '../screens/CreatePostScreen';
+// import LogOutScreen from '../screens/LogOut';
+// import RegisterScreen from '../screens/RegisterScreen';
+import SplashScreen from './navigation/SplashScreen';
 
 const Stack = createStackNavigator();
 
@@ -18,14 +32,16 @@ const navigationHandler = () => ({
   headerShown: false,
 });
 
-function HomeStack() {
+function HomeStack(props) {
+  // Reactotron.log('prop+++++++++>>', props.stories);
+  const data = props.stories;
   return (
     <Stack.Navigator initialRouteName="Home">
-      <Stack.Screen
-        name="Home"
-        component={HomeScreen}
-        options={navigationHandler}
-      />
+      <Stack.Screen name="Home" options={navigationHandler}>
+        {props => {
+          return <HomeScreen stories={data} />;
+        }}
+      </Stack.Screen>
       <Stack.Screen
         name="HomeDetails"
         component={HomeDetailsScreen}
@@ -93,19 +109,19 @@ function CustomHeader({title, isHome, navigation}) {
   );
 }
 
-function HomeScreen({navigation}) {
-  return (
-    <SafeAreaView style={{flex: 1}}>
-      <CustomHeader title="Home" isHome={true} navigation={navigation} />
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Home!</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('HomeDetails')}>
-          <Text>Got to details!</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-}
+// function HomeScreen({navigation}) {
+//   return (
+//     <SafeAreaView style={{flex: 1}}>
+//       <CustomHeader title="Home" isHome={true} navigation={navigation} />
+//       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+//         <Text>Home!</Text>
+//         <TouchableOpacity onPress={() => navigation.navigate('HomeDetails')}>
+//           <Text>Got to details!</Text>
+//         </TouchableOpacity>
+//       </View>
+//     </SafeAreaView>
+//   );
+// }
 
 function HomeDetailsScreen({navigation}) {
   return (
@@ -155,7 +171,9 @@ function NotificationsScreen({navigation}) {
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
-function TabNavigator() {
+function TabNavigator(props) {
+  const data = props;
+  // Reactotron.log("______________---", props)
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -186,19 +204,74 @@ function TabNavigator() {
         activeTintColor: 'tomato',
         inactiveTintColor: 'gray',
       }}>
-      <Tab.Screen name="Home" component={HomeStack} />
+      <Tab.Screen name="Home">
+        {props => {
+          return <HomeStack {...data} />;
+        }}
+      </Tab.Screen>
       <Tab.Screen name="Settings" component={SettingStack} />
     </Tab.Navigator>
   );
 }
 
+const initialState = {
+  data: [],
+  user: {},
+};
+const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case 'READ_MORE':
+      return {
+        ...state,
+        data: [{key: action.data}],
+      };
+    case 'LOGIN':
+      return {
+        ...state,
+        user: action.data,
+      };
+    case 'LOGOUT':
+      return {
+        ...state,
+        user: {},
+      };
+  }
+  return state;
+};
+
+const store = createStore(reducer);
+// const data = false;
 export default function App() {
+  const [data, setData] = React.useState([]);
+  const performTimeConsumingTask = async () => {
+    return new Promise(resolve =>
+      getFeeds().then(res => {
+        setData(res.data);
+        resolve(res.data);
+      }),
+    );
+  };
+
+  React.useEffect(() => {
+    performTimeConsumingTask();
+  }, []);
   return (
-    <NavigationContainer>
-      <Drawer.Navigator initialRouteName="TabMenu">
-        <Drawer.Screen name="TabMenu" component={TabNavigator} />
-        <Drawer.Screen name="Notifications" component={NotificationsScreen} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        {data.length === 0 ? (
+          <SplashScreen />
+        ) : (
+          <Drawer.Navigator initialRouteName="TabMenu">
+            <Drawer.Screen name="TabMenu">
+              {props => <TabNavigator stories={data} />}
+            </Drawer.Screen>
+            <Drawer.Screen
+              name="Notifications"
+              component={NotificationsScreen}
+            />
+          </Drawer.Navigator>
+        )}
+      </NavigationContainer>
+    </Provider>
   );
 }
