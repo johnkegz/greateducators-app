@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Button,
+  AsyncStorage,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -17,13 +18,13 @@ import Reactotron from 'reactotron-react-native';
 
 import HomeScreen from './screens/HomeScreen';
 import {getFeeds} from './APi/index';
-// import ContentScreen from '../screens/ContentScreen';
-// import WebViewComponent from '../screens/WebViewComponent';
-// import PostScreen from '../screens/PostScreen';
-// import LoginScreen from '../screens/LoginScreen';
-// import CreatePostScreen from '../screens/CreatePostScreen';
-// import LogOutScreen from '../screens/LogOut';
-// import RegisterScreen from '../screens/RegisterScreen';
+import ContentScreen from './screens/ContentScreen';
+// import WebViewComponent from './screens/WebViewComponent';
+import PostScreen from './screens/PostScreen';
+import LoginScreen from './screens/LoginScreen';
+import CreatePostScreen from './screens/CreatePostScreen';
+import LogOutScreen from './screens/LogOut';
+import RegisterScreen from './screens/RegisterScreen';
 import SplashScreen from './navigation/SplashScreen';
 
 const Stack = createStackNavigator();
@@ -33,130 +34,48 @@ const navigationHandler = () => ({
 });
 
 function HomeStack(props) {
-  // Reactotron.log('prop+++++++++>>', props.stories);
   const data = props.stories;
   return (
     <Stack.Navigator initialRouteName="Home">
       <Stack.Screen name="Home" options={navigationHandler}>
         {props => {
-          return <HomeScreen stories={data} />;
+          return <HomeScreen stories={data} {...props} />;
         }}
       </Stack.Screen>
-      <Stack.Screen
-        name="HomeDetails"
-        component={HomeDetailsScreen}
-        options={navigationHandler}
-      />
+      <Stack.Screen name="Content" options={navigationHandler}>
+        {props => {
+          return <ContentScreen {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="LogOut" options={navigationHandler}>
+        {props => {
+          return <LogOutScreen {...props} />;
+        }}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
 
-function SettingStack() {
+function CreatePostStack() {
+  // const [token, setToken] = React.useState('')
+  // AsyncStorage.getItem('jwtToken').then(res => {
+  //   setToken(res);
+  // });
   return (
-    <Stack.Navigator initialRouteName="Settings">
-      <Stack.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={navigationHandler}
-      />
-      <Stack.Screen
-        name="SettingsDetails"
-        component={SettingsDetailsScreen}
-        options={navigationHandler}
-      />
+    <Stack.Navigator initialRouteName="CreatePost">
+      {/* <Stack.Screen name="Post" component={Post} options={navigationHandler} /> */}
+
+      {/* <Stack.Screen name="Login" options={navigationHandler}>
+        {props => {
+          return <LoginScreen {...props} />;
+        }}
+      </Stack.Screen> */}
+      <Stack.Screen name="CreatePost" options={navigationHandler}>
+        {props => {
+          return <CreatePostScreen {...props} />;
+        }}
+      </Stack.Screen>
     </Stack.Navigator>
-  );
-}
-
-function CustomHeader({title, isHome, navigation}) {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        height: 50,
-      }}>
-      <View style={{flex: 1, justifyContent: 'center'}}>
-        {isHome ? (
-          <TouchableOpacity onPress={() => navigation.openDrawer()}>
-            <Image
-              style={{width: 30, height: 30, marginLeft: 5}}
-              source={require('./assets/images/list.png')}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <View style={{flexDirection: 'row'}}>
-              <Image
-                style={{width: 20, height: 20, marginLeft: 5}}
-                source={require('./assets/images/back.png')}
-                resizeMode="contain"
-              />
-              <Text>Back</Text>
-            </View>
-          </TouchableOpacity>
-        )}
-      </View>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-        }}>
-        <Text style={{textAlign: 'center'}}>{title}</Text>
-      </View>
-      <View style={{flex: 1}}></View>
-    </View>
-  );
-}
-
-// function HomeScreen({navigation}) {
-//   return (
-//     <SafeAreaView style={{flex: 1}}>
-//       <CustomHeader title="Home" isHome={true} navigation={navigation} />
-//       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-//         <Text>Home!</Text>
-//         <TouchableOpacity onPress={() => navigation.navigate('HomeDetails')}>
-//           <Text>Got to details!</Text>
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   );
-// }
-
-function HomeDetailsScreen({navigation}) {
-  return (
-    <SafeAreaView style={{flex: 1}} isHome={false}>
-      <CustomHeader title="HomeDetails" navigation={navigation} />
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Home Details!</Text>
-      </View>
-    </SafeAreaView>
-  );
-}
-
-function SettingsScreen({navigation}) {
-  return (
-    <SafeAreaView style={{flex: 1}}>
-      <CustomHeader title="settingsDetails" navigation={navigation} />
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Settings!</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('SettingsDetails')}>
-          <Text>Got to details!</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-}
-
-function SettingsDetailsScreen() {
-  return (
-    <SafeAreaView style={{flex: 1}}>
-      <CustomHeader title="settings" />
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Settings Details!</Text>
-      </View>
-    </SafeAreaView>
   );
 }
 
@@ -173,7 +92,6 @@ const Drawer = createDrawerNavigator();
 
 function TabNavigator(props) {
   const data = props;
-  // Reactotron.log("______________---", props)
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -184,10 +102,10 @@ function TabNavigator(props) {
             iconName = focused
               ? require('./assets/images/home.png')
               : require('./assets/images/home-black.png');
-          } else if (route.name === 'Settings') {
+          } else if (route.name === 'Create story') {
             iconName = focused
-              ? require('./assets/images/settings.png')
-              : require('./assets/images/settings-black.png');
+              ? require('./assets/images/writing.png')
+              : require('./assets/images/blog.png');
           }
 
           // You can return any component that you like here!
@@ -206,10 +124,11 @@ function TabNavigator(props) {
       }}>
       <Tab.Screen name="Home">
         {props => {
-          return <HomeStack {...data} />;
+          return <HomeStack {...data} {...props} />;
         }}
       </Tab.Screen>
-      <Tab.Screen name="Settings" component={SettingStack} />
+      {/* <Tab.Screen name="Login" component={LoginScreenStack} /> */}
+      <Tab.Screen name="Create story" component={CreatePostStack} />
     </Tab.Navigator>
   );
 }
@@ -240,9 +159,44 @@ const reducer = (state = initialState, action) => {
 };
 
 const store = createStore(reducer);
+
+const Display = () => {
+  return (
+    <>
+      <View>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+        <Text>teyr</Text>
+      </View>
+    </>
+  );
+};
 // const data = false;
-export default function App() {
-  const [data, setData] = React.useState([]);
+export default function App(props) {
+  const [postData, setData] = React.useState([]);
+  const [token, setToken] = React.useState('');
   const performTimeConsumingTask = async () => {
     return new Promise(resolve =>
       getFeeds().then(res => {
@@ -252,26 +206,37 @@ export default function App() {
     );
   };
 
+  AsyncStorage.getItem('jwtToken').then(res => {
+    setToken(res);
+  });
+
   React.useEffect(() => {
     performTimeConsumingTask();
   }, []);
+
+  const handletoken = tokenData => {
+    return setToken(tokenData);
+  };
+  const handleAppState = () => {
+    if (postData.length === 0) {
+      return <SplashScreen />;
+    } else if (token === '' || token === null) {
+      return <LoginScreen handletoken={handletoken} />;
+    } else {
+      // alert(2)
+      return (
+        <Drawer.Navigator initialRouteName="TabMenu">
+          <Drawer.Screen name="TabMenu">
+            {props => <TabNavigator stories={postData} />}
+          </Drawer.Screen>
+          <Drawer.Screen name="Notifications" component={NotificationsScreen} />
+        </Drawer.Navigator>
+      );
+    }
+  };
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        {data.length === 0 ? (
-          <SplashScreen />
-        ) : (
-          <Drawer.Navigator initialRouteName="TabMenu">
-            <Drawer.Screen name="TabMenu">
-              {props => <TabNavigator stories={data} />}
-            </Drawer.Screen>
-            <Drawer.Screen
-              name="Notifications"
-              component={NotificationsScreen}
-            />
-          </Drawer.Navigator>
-        )}
-      </NavigationContainer>
+      <NavigationContainer>{handleAppState()}</NavigationContainer>
     </Provider>
   );
 }

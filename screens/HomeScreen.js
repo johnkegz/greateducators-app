@@ -16,6 +16,7 @@ import {getFeeds, getAd} from '../APi/index';
 import ReadMore from './More';
 import {connect} from 'react-redux';
 import Reactotron from 'reactotron-react-native';
+import CustomHeader from './Utils/customHeader';
 
 class HomeScreen extends Component {
   state = {
@@ -24,7 +25,6 @@ class HomeScreen extends Component {
     adData: [],
     readMore: false,
   };
-  // Reactotron.log("data +++}}}}}}", this.props);
   displayFeed = stories => {
     const result =
       stories.length === 0 ? (
@@ -54,9 +54,11 @@ class HomeScreen extends Component {
                 </TouchableOpacity>
               </View>
               <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate('Content', {story: story})
-                }>
+                onPress={() => {
+                  return this.props.navigation.navigate('Content', {
+                    story: story,
+                  });
+                }}>
                 <View style={styles.feedStory}>
                   <View style={styles.title}>
                     <Text>{story.title}</Text>
@@ -133,6 +135,11 @@ class HomeScreen extends Component {
     const {data, refreshing} = this.state;
     return (
       <View style={styles.container}>
+        <CustomHeader
+          title="Geat educators Uganda"
+          isHome={true}
+          navigation={this.props.navigation}
+        />
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
@@ -227,7 +234,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    shadowOffset: { 
+    shadowOffset: {
       height: 1,
       width: 1,
     },

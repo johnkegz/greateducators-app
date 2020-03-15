@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {View, Text, AsyncStorage} from 'react-native';
+import {View, Text, AsyncStorage, TouchableOpacity} from 'react-native';
 
 class LogOutScreen extends Component {
   signOutAsync = async () => {
@@ -14,7 +14,11 @@ class LogOutScreen extends Component {
   render() {
     return (
       <View>
-        <Text>Log out</Text>
+        <TouchableOpacity
+        // onPress={() => this.props.navigation.navigate('Login')}>
+        >
+          <Text>Login</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -31,7 +35,4 @@ function mapDispatchToProps(dispatch) {
     logOut: () => dispatch({type: 'LOGOUT'}),
   };
 }
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(LogOutScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(LogOutScreen);
