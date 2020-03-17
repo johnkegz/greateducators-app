@@ -15,10 +15,12 @@ import {
 import {getFeeds, getAd} from '../APi/index';
 import ReadMore from './More';
 import {connect} from 'react-redux';
+import Reactotron from 'reactotron-react-native';
+import CustomHeader from './Utils/customHeader';
 
 class HomeScreen extends Component {
   state = {
-    data: this.props.navigation.getParam('stories'),
+    data: this.props.stories ? this.props.stories : [],
     refreshing: false,
     adData: [],
     readMore: false,
@@ -52,9 +54,11 @@ class HomeScreen extends Component {
                 </TouchableOpacity>
               </View>
               <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate('Content', {story: story})
-                }>
+                onPress={() => {
+                  return this.props.navigation.navigate('Content', {
+                    story: story,
+                  });
+                }}>
                 <View style={styles.feedStory}>
                   <View style={styles.title}>
                     <Text>{story.title}</Text>
@@ -127,11 +131,15 @@ class HomeScreen extends Component {
     return ads;
   };
 
-
   render() {
     const {data, refreshing} = this.state;
     return (
       <View style={styles.container}>
+        <CustomHeader
+          title="Geat educators Uganda"
+          isHome={true}
+          navigation={this.props.navigation}
+        />
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
@@ -162,7 +170,7 @@ class HomeScreen extends Component {
           </View>
           <View style={styles.getStartedContainer}>
             <TouchableOpacity
-              onPress={ ()=> Linking.openURL('http://greateducatorsug.org/') }>
+              onPress={() => Linking.openURL('http://greateducatorsug.org/')}>
               <Text style={styles.helpLinkText}>Great Educators Forum</Text>
             </TouchableOpacity>
           </View>
@@ -203,10 +211,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(HomeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {

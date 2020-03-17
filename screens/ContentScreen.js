@@ -3,10 +3,11 @@ import {Text, View, StyleSheet, Image, ScrollView} from 'react-native';
 import {getFeed} from '../APi/index';
 import HTML from 'react-native-render-html';
 import moment from 'moment';
+import CustomHeader from './Utils/customHeader';
 
 export class ContentScreen extends Component {
   state = {
-    data: this.props.navigation.getParam('story'),
+    data: this.props.route.params.story,
   };
 
   render() {
@@ -26,39 +27,42 @@ export class ContentScreen extends Component {
           margin-top: 3;">${time}</div>`;
     return (
       <View style={styles.main}>
-        <ScrollView>
-          <View style={styles.imageView}>
-            {picUrl ? (
-              <Image source={{uri: picUrl}} style={styles.image} />
-            ) : (
-              <Text>Loading image</Text>
-            )}
-          </View>
-          <View>
-            <Text style={styles.title}>
-              <Text style={{fontWeight: 'bold'}}>{title}</Text>
-            </Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row'}}>
-            <View>
-              <HTML html={timeData} />
+        <CustomHeader title="story" navigation={this.props.navigation} />
+        <View style={styles.body}>
+          <ScrollView>
+            <View style={styles.imageView}>
+              {picUrl ? (
+                <Image source={{uri: picUrl}} style={styles.image} />
+              ) : (
+                <Text>Loading image</Text>
+              )}
             </View>
             <View>
-              <Text>
-                <Text>         </Text>
+              <Text style={styles.title}>
+                <Text style={{fontWeight: 'bold'}}>{title}</Text>
               </Text>
             </View>
-            <View>
-              <Text style={styles.by}>posted by: </Text>
+            <View style={{flex: 1, flexDirection: 'row'}}>
+              <View>
+                <HTML html={timeData} />
+              </View>
+              <View>
+                <Text>
+                  <Text> </Text>
+                </Text>
+              </View>
+              <View>
+                <Text style={styles.by}>posted by: </Text>
+              </View>
+              <View>
+                <Text style={styles.by}>{lastName}</Text>
+              </View>
             </View>
-            <View>
-              <Text style={styles.by}>{lastName}</Text>
+            <View style={styles.feed}>
+              {feed ? <HTML html={feed} /> : <Text />}
             </View>
-          </View>
-          <View style={styles.feed}>
-            {feed ? <HTML html={feed} /> : <Text />}
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
       </View>
     );
   }
@@ -66,8 +70,10 @@ export class ContentScreen extends Component {
 
 const styles = StyleSheet.create({
   main: {
-    padding: 20,
     flex: 1,
+  },
+  body:{
+    padding: 20,
   },
   by: {
     fontSize: 12,

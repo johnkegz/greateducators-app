@@ -1,6 +1,8 @@
 import {AsyncStorage} from 'react-native';
 import setAuthToken from '../Utils/setAuthToken';
 import jwtDecode from 'jwt-decode';
+
+import Reactotron from 'reactotron-react-native';
 export const auth = async response => {
   try {
     if (response.data.token === undefined) {

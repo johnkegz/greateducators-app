@@ -15,6 +15,8 @@ import {Form, Field} from 'react-native-validate-form';
 import {login} from './Auth/Api';
 import {auth} from './Auth/auth';
 import {AsyncStorage} from 'react-native';
+import CustomHeader from './Utils/customHeader';
+import Reactotron from 'reactotron-react-native';
 
 const required = value => (value ? undefined : 'This is a required field.');
 const email = value =>
@@ -26,15 +28,15 @@ class LoginScreen extends Component {
   initialState = {
     email: '',
     password: '',
+    token: '',
   };
   state = this.initialState;
+
   static getDerivedStateFromProps(props, state) {
-    if (
-      props.loginData !== undefined &&
-      Object.keys(props.loginData).length !== 0 &&
-      props.loginData.constructor === Object
-    ) {
-      props.navigation.navigate('CreatePost');
+    const {token} = state;
+    if (token === '' || token === null) {
+      props.handletoken(token);
+      // props.navigation.navigate('Home');
     }
     return null;
   }
@@ -43,12 +45,6 @@ class LoginScreen extends Component {
     const userToken = await AsyncStorage.getItem('jwtToken');
     return userToken;
   };
-
-  // handleSubmit = e => {
-  //   e.preventDefault();
-  //   this.props.login(this.state);
-  //   this.setState(this.initialState);
-  // };
 
   submitForm() {
     let submitResults = this.myForm.validate();
@@ -72,10 +68,10 @@ class LoginScreen extends Component {
   }
   displayForm(email, password) {
     return (
-      <View>
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={styles.form}>
+        {/* <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Text>Login</Text>
-      </View>
+      </View> */}
         <Form
           ref={ref => (this.myForm = ref)}
           validate={true}
@@ -89,7 +85,7 @@ class LoginScreen extends Component {
             name="email"
             value={this.state.email}
             onChangeText={val => this.setState({email: val})}
-            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20,}}
+            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20}}
             placeholder={'Enter email'}
           />
           <Field
@@ -99,7 +95,7 @@ class LoginScreen extends Component {
             name="password"
             value={this.state.password}
             onChangeText={val => this.setState({password: val})}
-            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20,}}
+            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20}}
             secureTextEntry={true}
             placeholder={'Enter password'}
           />
@@ -108,16 +104,29 @@ class LoginScreen extends Component {
           <Button title="SUBMIT" onPress={this.submitForm.bind(this)}></Button>
         </View>
         <View>
-          <TouchableOpacity onPress={() => this.props.navigation.navigate('Register')}>
-            <Text style={{color: "#1E90FF"}}>Register</Text>
+          <TouchableOpacity
+          // onPress={() => this.props.navigation.navigate('Register')}
+          >
+            <Text style={{color: '#1E90FF'}}>Register</Text>
           </TouchableOpacity>
         </View>
       </View>
     );
   }
+
+  componentDidMount() {
+    AsyncStorage.getItem('jwtToken').then(res => {
+      this.setState({token: res});
+    });
+  }
   render() {
     const {password} = this.state;
-    return <View style={styles.container}>{this.displayForm(email, password)}</View>;
+    return (
+      <View style={styles.container}>
+        <CustomHeader title="Login" />
+        {this.displayForm(email, password)}
+      </View>
+    );
   }
 }
 //input feild
@@ -158,7 +167,7 @@ const InputField = ({
   );
 };
 function mapStateToProps(state) {
-  console.log('user state global state__+_+__+_+_+_+_+_+_0000000000000000000', state);
+  Reactotron.log('state >>', state);
   return {
     loginData: state.user,
   };
@@ -169,20 +178,20 @@ function mapDispatchToProps(dispatch) {
     login: data => {
       login(data).then(res => {
         auth(res).then(response => {
-          dispatch({type: 'LOGIN', data: response});
+          return dispatch({type: 'LOGIN', data: response});
         });
       });
     },
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(LoginScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
 
 const styles = StyleSheet.create({
   container: {
+    // padding: 10,
+  },
+  form: {
     padding: 10,
   },
   submitButton: {
@@ -192,5 +201,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 });
