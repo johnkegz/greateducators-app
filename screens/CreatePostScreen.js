@@ -155,11 +155,11 @@ class CreatePostScreen extends React.Component {
     let that = this;
     return (
       <SafeAreaView style={styles.container}>
-        <CustomHeader
+        {/* <CustomHeader
           title={this.state.focusStatus ? 'Done' : 'create post'}
           navigation={this.props.navigation}
           handleFocus={this.handleFocus}
-        />
+        /> */}
         <View style={styles.containerBody}>
           <View style={styles.logOut}>
             <View style={styles.upperButtons}>

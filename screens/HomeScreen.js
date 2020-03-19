@@ -135,11 +135,11 @@ class HomeScreen extends Component {
     const {data, refreshing} = this.state;
     return (
       <View style={styles.container}>
-        <CustomHeader
+        {/* <CustomHeader
           title="Geat educators Uganda"
           isHome={true}
           navigation={this.props.navigation}
-        />
+        /> */}
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
