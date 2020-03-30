@@ -7,7 +7,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+<<<<<<< HEAD
   KeyboardAvoidingView
+=======
+>>>>>>> 9af54d9f075dcc39884d90042866df96c83c1c51
 } from 'react-native';
 
 import socketIOClient from 'socket.io-client';
