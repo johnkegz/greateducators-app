@@ -55,7 +55,6 @@ export default function Routes(props) {
   useEffect(() => {
     async function f() {
       const data = await performTimeConsumingTask();
-      Reactotron.log('>>>>>>>>>>>>>>>>>', data);
       //   if (data !== null) {
       //     setData(data);
       //   }

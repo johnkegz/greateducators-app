@@ -7,11 +7,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-<<<<<<< HEAD
-  KeyboardAvoidingView
-=======
->>>>>>> 9af54d9f075dcc39884d90042866df96c83c1c51
+  KeyboardAvoidingView,
+  AsyncStorage
 } from 'react-native';
+import jwtDecode from 'jwt-decode';
 
 import socketIOClient from 'socket.io-client';
 import ChatBody from './ChatBody';
@@ -20,25 +19,31 @@ import ChatForm from './ChatForm';
 class ChatScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.socket = socketIOClient('http://10.20.74.36:3000');
+    this.socket = socketIOClient('http://192.168.43.52:3001');
     this.initialState = {
-      message: '',
+      message: {},
       chatMessages: [],
+      userId: null,
     };
     this.state = this.initialState;
   }
 
   componentDidMount() {
     this.socket.on('message', data => {
-      this.setState({
-        chatMessages: data,
+      this.setState(prevState => {
+        return {...prevState, chatMessages: [...data],}
       });
+    });
+
+    AsyncStorage.getItem('jwtToken').then(res => {
+      const decoded = jwtDecode(res);
+      this.setState({userId: decoded.id});
     });
   }
 
   handleMessage = val => {
     return this.setState({
-      message: val,
+      message: {val: val, userId: this.state.userId},
     });
   };
   handleSubmit = () => {
@@ -51,24 +56,38 @@ class ChatScreen extends React.Component {
     return (
       <View>
         {this.state.chatMessages.map((message, index) => {
-          return <Text key={index}>{message.message}</Text>;
+          const displayType = message.message.userId === this.state.userId? "none": "flex";
+          return (
+            <>
+            <View style={styles.messageContainer}>
+                <View style={{borderColor: "brown", borderWidth: 1, height: 60, width: 60, borderRadius: 50, display: displayType}}>
+                  <Text>img</Text>
+                </View>
+                  <View style={{borderColor: "brown", borderWidth: 1, width: "80%", marginTop: 4, minHeight: 50, marginLeft: displayType === "none"? 65: 0}}><Text>{message.message.val}</Text></View>
+            </View>
+          </>
+          );
         })}
       </View>
     );
   };
   render() {
+    console.log("statee>>>>>", this.state.chatMessages)
     return (
       <>
         <SafeAreaView>
-          <KeyboardAvoidingView>
+        
           <ScrollView contentInsetAdjustmentBehavior="automatic">
-            <ChatBody displayMessages={this.displayMessages} />
+            <View style={{maxHeight: 650}}>
+              <ChatBody displayMessages={this.displayMessages} />
+            </View>
+            
             <ChatForm
               handleMessage={this.handleMessage}
               handleSubmit={this.handleSubmit}
             />
           </ScrollView>
-          </KeyboardAvoidingView>
+        
         </SafeAreaView>
       </>
     );
@@ -76,3 +95,20 @@ class ChatScreen extends React.Component {
 }
 
 export default ChatScreen;
+
+const styles = StyleSheet.create({
+  chartBody: {
+    // padding: 10,
+    // margin: 10,
+    minHeight: 650,
+  },
+  messageContainer:{
+    flex: 1,
+    flexDirection: "row",
+    marginLeft: 2,
+    
+  },
+  personalContainer:{
+    marginLeft: 2,
+  },
+});

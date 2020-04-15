@@ -31,7 +31,6 @@ import SplashScreen from './navigation/SplashScreen';
 import CustomHeader from './screens/Utils/customHeader';
 import Animated from 'react-native-reanimated';
 function MyTabBar({state, descriptors, navigation, position}) {
-  console.log("navigation >>>>>   ", navigation)
   return (
     <View>
       <View

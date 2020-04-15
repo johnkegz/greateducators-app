@@ -41,7 +41,6 @@ class CreatePostScreen extends React.Component {
   state = this.initialState;
 
   static getDerivedStateFromProps(props, state) {
-    Reactotron.log('oppopop>>>>', state);
     if (!props.loginData.id) {
       // return props.navigation.navigate('Login');
     }

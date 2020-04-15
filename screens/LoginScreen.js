@@ -85,7 +85,9 @@ class LoginScreen extends Component {
             name="email"
             value={this.state.email}
             onChangeText={val => this.setState({email: val})}
-            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20}}
+            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20, borderWidth: 4,
+            borderColor: "grey",
+            borderRadius: 60, padding: 15}}
             placeholder={'Enter email'}
           />
           <Field
@@ -95,13 +97,20 @@ class LoginScreen extends Component {
             name="password"
             value={this.state.password}
             onChangeText={val => this.setState({password: val})}
-            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20}}
+            customStyle={{backgroundColor: '#F5FCFF', marginVertical: 20, borderWidth: 4,
+            borderColor: "grey",
+            borderRadius: 60, padding: 15}}
             secureTextEntry={true}
             placeholder={'Enter password'}
           />
         </Form>
         <View style={styles.submitButton}>
-          <Button title="SUBMIT" onPress={this.submitForm.bind(this)}></Button>
+          <Button title="SUBMIT" onPress={this.submitForm.bind(this)} buttonStyle={{backgroundColor: 'red', width:10, borderRadius: 90,}} borderRadius="90" color="red"></Button>
+          <TouchableOpacity>
+            <View style={{flex: 1, width:100}}>
+              <Text style={{backgroundColor: 'red', width: 100}}>SUBMIT</Text>
+            </View>
+          </TouchableOpacity>
         </View>
         <View>
           <TouchableOpacity
