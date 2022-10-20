@@ -25,7 +25,7 @@
     "react-native-image-picker": "^1.1.0",
     "react-native-jsontokens": "^0.7.7",
     "react-native-pell-rich-editor": "^1.0.4",
-    "react-native-reanimated": "^1.7.0",
+    "react-native-reanimated": "^2.10.0",
     "react-native-render-html": "^4.1.2",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.2.0",
